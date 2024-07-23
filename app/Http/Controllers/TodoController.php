@@ -15,7 +15,7 @@ class TodoController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'text' => 'required|string',
+            'task' => 'required|string',
             'completed' => 'required|boolean',
         ]);
 
