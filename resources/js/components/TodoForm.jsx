@@ -1,4 +1,3 @@
-// resources/js/components/TodoApp.jsx
 import React, { useState, useEffect } from "react";
 
 const TodoApp = () => {
@@ -7,16 +6,16 @@ const TodoApp = () => {
 
     useEffect(() => {
         const fetchTodos = async () => {
-          try {
-            const response = await axios.get('/api/todos');
-            setTasks(response.data);
-          } catch (error) {
-            console.error('Error fetching data:', error);
-          }
+            try {
+                const response = await axios.get("/api/todos");
+                setTasks(response.data);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
         };
-    
+
         fetchTodos();
-      }, []);
+    }, []);
 
     const addTask = () => {
         if (task) {
@@ -39,8 +38,10 @@ const TodoApp = () => {
         setTasks(newTasks);
     };
 
-    const removeTask = (index) => {
-        setTasks(tasks.filter((_, i) => i !== index));
+    const deleteTask = (id) => {
+        axios.delete(`/api/todos/${id}`).then(() => {
+            setTasks(tasks.filter((t) => t.id !== id));
+        });
     };
 
     return (
@@ -71,7 +72,7 @@ const TodoApp = () => {
                             {t.task}
                         </span>
                         <button
-                            onClick={() => removeTask(i)}
+                            onClick={() => deleteTask(t.id)}
                             className="ml-2 text-red-500"
                         >
                             Delete
