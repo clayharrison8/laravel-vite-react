@@ -7,8 +7,15 @@ const TodoApp = () => {
 
     const addTask = () => {
         if (task) {
-            setTasks([...tasks, { text: task, completed: false }]);
-            setTask("");
+            axios
+                .post("/api/todos", { task, completed: false })
+                .then((response) => {
+                    setTasks([...tasks, response.data]);
+                    setTask("");
+                })
+                .catch((error) => {
+                    console.error("There was an error adding the task!", error);
+                });
         }
     };
 
