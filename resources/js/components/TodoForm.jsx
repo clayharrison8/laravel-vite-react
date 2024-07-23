@@ -26,16 +26,29 @@ const TodoApp = () => {
                     setTask("");
                 })
                 .catch((error) => {
-                    console.error("There was an error adding the task!", error);
+                    console.error("There was an error adding the task:", error);
                 });
         }
     };
 
-    const toggleTask = (index) => {
-        const newTasks = tasks.map((t, i) =>
-            i === index ? { ...t, completed: !t.completed } : t
-        );
-        setTasks(newTasks);
+    const toggleTask = (taskToToggle) => {
+        const updatedTask = {
+            ...taskToToggle,
+            completed: !taskToToggle.completed,
+        };
+
+        axios
+            .put(`/api/todos/${taskToToggle.id}`, updatedTask)
+            .then(() => {
+                setTasks((prevTasks) =>
+                    prevTasks.map((task) =>
+                        task.id === taskToToggle.id ? updatedTask : task
+                    )
+                );
+            })
+            .catch((error) => {
+                console.error("There was an error updating the task:", error);
+            });
     };
 
     const deleteTask = (id) => {
@@ -65,7 +78,7 @@ const TodoApp = () => {
                         <input
                             type="checkbox"
                             checked={t.completed}
-                            onChange={() => toggleTask(i)}
+                            onChange={() => toggleTask(t)}
                             className="mr-2"
                         />
                         <span className={t.completed ? "line-through" : ""}>
