@@ -1,9 +1,22 @@
 // resources/js/components/TodoApp.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const TodoApp = () => {
     const [tasks, setTasks] = useState([]);
     const [task, setTask] = useState("");
+
+    useEffect(() => {
+        const fetchTodos = async () => {
+          try {
+            const response = await axios.get('/api/todos');
+            setTasks(response.data);
+          } catch (error) {
+            console.error('Error fetching data:', error);
+          }
+        };
+    
+        fetchTodos();
+      }, []);
 
     const addTask = () => {
         if (task) {
@@ -55,7 +68,7 @@ const TodoApp = () => {
                             className="mr-2"
                         />
                         <span className={t.completed ? "line-through" : ""}>
-                            {t.text}
+                            {t.task}
                         </span>
                         <button
                             onClick={() => removeTask(i)}
