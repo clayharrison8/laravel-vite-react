@@ -27,9 +27,12 @@ const AddTodo = ({ onTaskAdded }) => {
                 onChange={(e) => setTask(e.target.value)}
                 className="border p-2"
             />
+
             <button
                 onClick={addTask}
-                className="bg-blue-500 text-white p-2 ml-2"
+                className="bg-blue-400 p-2 ml-2 disabled:opacity-50 disabled:cursor-not-allowed 
+                md:text-lg text-white bg-app-blue px-2 md:px-4 rounded-3xl py-1.5 
+                transition-transform duration-500 hover:scale-110 hover:animate-pulse"
             >
                 Add Task
             </button>

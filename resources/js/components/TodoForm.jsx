@@ -42,7 +42,7 @@ const TodoApp = () => {
     const sortedTasks = tasks.slice().sort((a, b) => a.completed - b.completed);
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="max-w-lg mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Todo List</h1>
             <AddTodo onTaskAdded={handleTaskAdded} />
             <ul className="mt-4">

@@ -58,7 +58,7 @@ const TodoItem = ({
     };
 
     return (
-        <li className="flex items-center mb-2">
+        <li className="flex items-center mb-2 last:mb-0 border-b border-gray-300 last:border-b-0 p-2 last:pb-0">
             <input
                 type="checkbox"
                 checked={task.completed}
@@ -75,13 +75,17 @@ const TodoItem = ({
                     />
                     <button
                         onClick={handleUpdateTask}
-                        className="ml-2 text-green-500"
+                        className="bg-blue-400 p-2 ml-2 disabled:opacity-50 disabled:cursor-not-allowed 
+                        md:text-lg text-white bg-app-blue px-4 rounded-3xl py-1.5 
+                        transition-transform duration-500 hover:scale-110 hover:animate-pulse"
                     >
                         Save
                     </button>
+
+                    
                     <button
                         onClick={cancelEditing}
-                        className="ml-2 text-gray-500"
+                        className="ml-2 cursor-pointer border-2 border-black rounded-full py-1.5 px-4 transition duration-1000 hover:bg-black hover:text-white inline-block"
                     >
                         Cancel
                     </button>
@@ -97,11 +101,13 @@ const TodoItem = ({
                     </span>
                     <button
                         onClick={startEditing}
-                        className="ml-2 text-blue-500"
+                        className="bg-blue-400 p-2 ml-2 disabled:opacity-50 disabled:cursor-not-allowed 
+                        md:text-lg text-white bg-app-blue px-4 rounded-3xl py-1.5 
+                        transition-transform duration-500 hover:scale-110 hover:animate-pulse"
                     >
                         Edit
                     </button>
-                    <button onClick={deleteTask} className="ml-2 text-red-500">
+                    <button onClick={deleteTask} className="ml-2 cursor-pointer border-2 border-black rounded-full py-1.5 px-4 transition duration-1000 hover:bg-black hover:text-white inline-block">
                         Delete
                     </button>
                 </>
