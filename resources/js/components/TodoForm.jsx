@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import apiRequest from "../api/apiUtils";
 import AddTodo from "./AddTodo";
+import TodoItem from "./TodoItem";
 
 const TodoApp = () => {
     const [tasks, setTasks] = useState([]);
@@ -24,75 +25,18 @@ const TodoApp = () => {
         setTasks((prevTasks) => [...prevTasks, newTask]);
     };
 
-    const toggleTask = async (taskToToggle) => {
-        const updatedTask = {
-            ...taskToToggle,
-            completed: !taskToToggle.completed,
-        };
-        try {
-            await apiRequest(
-                "put",
-                `/api/todos/${taskToToggle.id}`,
-                updatedTask
-            );
-            setTasks((prevTasks) =>
-                prevTasks.map((task) =>
-                    task.id === taskToToggle.id ? updatedTask : task
-                )
-            );
-        } catch (error) {
-            console.error("Error updating task:", error);
-        }
+    const handleTaskUpdated = (updatedTask) => {
+        setTasks((prevTasks) =>
+            prevTasks.map((task) =>
+                task.id === updatedTask.id ? updatedTask : task
+            )
+        );
     };
 
-    const deleteTask = async (id) => {
-        try {
-            await apiRequest("delete", `/api/todos/${id}`);
-            setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
-        } catch (error) {
-            console.error("Error deleting task:", error);
-        }
-    };
-
-    const updateTask = async () => {
-        if (editingTaskId && newTaskContent) {
-            const updatedTask = tasks.find((task) => task.id === editingTaskId);
-            const updatedTaskData = { ...updatedTask, task: newTaskContent };
-            try {
-                await apiRequest(
-                    "put",
-                    `/api/todos/${editingTaskId}`,
-                    updatedTaskData
-                );
-                setTasks((prevTasks) =>
-                    prevTasks.map((task) =>
-                        task.id === editingTaskId ? updatedTaskData : task
-                    )
-                );
-                setEditingTaskId(null);
-                setNewTaskContent("");
-            } catch (error) {
-                console.error("Error updating task:", error);
-            }
-        }
-    };
-
-    const startEditing = (task) => {
-        setEditingTaskId(task.id);
-        setNewTaskContent(task.task);
-    };
-
-    const handleUpdateTask = () => {
-        if (editingTaskId && newTaskContent) {
-            updateTask();
-            setEditingTaskId(null);
-            setNewTaskContent("");
-        }
-    };
-
-    const cancelEditing = () => {
-        setEditingTaskId(null);
-        setNewTaskContent("");
+    const handleTaskDeleted = (deletedTaskId) => {
+        setTasks((prevTasks) =>
+            prevTasks.filter((task) => task.id !== deletedTaskId)
+        );
     };
 
     const sortedTasks = tasks.slice().sort((a, b) => a.completed - b.completed);
@@ -102,68 +46,17 @@ const TodoApp = () => {
             <h1 className="text-2xl font-bold mb-4">Todo List</h1>
             <AddTodo onTaskAdded={handleTaskAdded} />
             <ul className="mt-4">
-                {sortedTasks.map((t) => (
-                    <li key={t.id} className="flex items-center mb-2">
-                        <input
-                            type="checkbox"
-                            checked={t.completed}
-                            onChange={() => toggleTask(t)}
-                            className="mr-2"
-                        />
-                        {editingTaskId === t.id ? (
-                            <span className="flex-1">
-                                <input
-                                    type="text"
-                                    value={newTaskContent}
-                                    onChange={(e) =>
-                                        setNewTaskContent(e.target.value)
-                                    }
-                                    className="border p-2"
-                                />
-                            </span>
-                        ) : (
-                            <span
-                                className={
-                                    t.completed
-                                        ? "line-through flex-1"
-                                        : "flex-1"
-                                }
-                            >
-                                {t.task}
-                            </span>
-                        )}
-                        {editingTaskId === t.id ? (
-                            <>
-                                <button
-                                    onClick={handleUpdateTask}
-                                    className="ml-2 text-green-500"
-                                >
-                                    Save
-                                </button>
-                                <button
-                                    onClick={cancelEditing}
-                                    className="ml-2 text-gray-500"
-                                >
-                                    Cancel
-                                </button>
-                            </>
-                        ) : (
-                            <>
-                                <button
-                                    onClick={() => startEditing(t)}
-                                    className="ml-2 text-blue-500"
-                                >
-                                    Edit
-                                </button>
-                                <button
-                                    onClick={() => deleteTask(t.id)}
-                                    className="ml-2 text-red-500"
-                                >
-                                    Delete
-                                </button>
-                            </>
-                        )}
-                    </li>
+                {sortedTasks.map((task) => (
+                    <TodoItem
+                        key={task.id}
+                        task={task}
+                        onTaskUpdated={handleTaskUpdated}
+                        onTaskDeleted={handleTaskDeleted}
+                        editingTaskId={editingTaskId}
+                        setEditingTaskId={setEditingTaskId}
+                        newTaskContent={newTaskContent}
+                        setNewTaskContent={setNewTaskContent}
+                    />
                 ))}
             </ul>
         </div>
