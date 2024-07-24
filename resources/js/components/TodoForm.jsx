@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import apiRequest from "../api/apiUtils";
 
 const TodoApp = () => {
     const [tasks, setTasks] = useState([]);
@@ -9,8 +10,8 @@ const TodoApp = () => {
     useEffect(() => {
         const fetchTodos = async () => {
             try {
-                const response = await axios.get("/api/todos");
-                setTasks(response.data);
+                const response = await apiRequest("get", "/api/todos");
+                setTasks(response);
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -19,63 +20,64 @@ const TodoApp = () => {
         fetchTodos();
     }, []);
 
-    const addTask = () => {
+    const addTask = async () => {
         if (task) {
-            axios
-                .post("/api/todos", { task, completed: false })
-                .then((response) => {
-                    setTasks([...tasks, response.data]);
-                    setTask("");
-                })
-                .catch((error) => {
-                    console.error("There was an error adding the task:", error);
+            try {
+                const newTask = await apiRequest("post", "/api/todos", {
+                    task: taskInput,
+                    completed: false,
                 });
+                setTasks((prevTasks) => [...prevTasks, newTask]);
+                setTaskInput("");
+            } catch (error) {
+                console.error("Error adding task:", error);
+            }
         }
     };
 
-    const toggleTask = (taskToToggle) => {
+    const toggleTask = async (taskToToggle) => {
         const updatedTask = {
             ...taskToToggle,
             completed: !taskToToggle.completed,
         };
-
-        axios
-            .put(`/api/todos/${taskToToggle.id}`, updatedTask)
-            .then(() => {
-                setTasks((prevTasks) =>
-                    prevTasks.map((task) =>
-                        task.id === taskToToggle.id ? updatedTask : task
-                    )
-                );
-            })
-            .catch((error) => {
-                console.error("There was an error updating the task:", error);
-            });
+        try {
+            await apiRequest(
+                "put",
+                `/api/todos/${taskToToggle.id}`,
+                updatedTask
+            );
+            setTasks((prevTasks) =>
+                prevTasks.map((task) =>
+                    task.id === taskToToggle.id ? updatedTask : task
+                )
+            );
+        } catch (error) {
+            console.error("Error updating task:", error);
+        }
     };
 
-    const deleteTask = (id) => {
-        axios.delete(`/api/todos/${id}`).then(() => {
-            setTasks(tasks.filter((t) => t.id !== id));
-        });
+    const deleteTask = async (id) => {
+        try {
+            await apiRequest("delete", `/api/todos/${id}`);
+            setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+        } catch (error) {
+            console.error("Error deleting task:", error);
+        }
     };
 
-    const updateTask = (id, newTaskContent) => {
-        const updatedTask = tasks.find((task) => task.id === id);
-
-        const updatedTaskData = { ...updatedTask, task: newTaskContent };
-
-        axios
-            .put(`/api/todos/${id}`, updatedTaskData)
-            .then(() => {
-                setTasks((prevTasks) =>
-                    prevTasks.map((task) =>
-                        task.id === id ? updatedTaskData : task
-                    )
-                );
-            })
-            .catch((error) => {
-                console.error("There was an error updating the task:", error);
-            });
+    const updateTask = async () => {
+        if (editingTaskId && newTaskContent) {
+            const updatedTask = tasks.find(task => task.id === editingTaskId);
+            const updatedTaskData = { ...updatedTask, task: newTaskContent };
+            try {
+                await apiRequest('put', `/api/todos/${editingTaskId}`, updatedTaskData);
+                setTasks(prevTasks => prevTasks.map(task => task.id === editingTaskId ? updatedTaskData : task));
+                setEditingTaskId(null);
+                setNewTaskContent("");
+            } catch (error) {
+                console.error("Error updating task:", error);
+            }
+        }
     };
 
     const startEditing = (task) => {
@@ -85,7 +87,7 @@ const TodoApp = () => {
 
     const handleUpdateTask = () => {
         if (editingTaskId && newTaskContent) {
-            updateTask(editingTaskId, newTaskContent);
+            updateTask();
             setEditingTaskId(null);
             setNewTaskContent("");
         }
