@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import apiRequest from "../api/apiUtils";
+import AddTodo from "./AddTodo";
 
 const TodoApp = () => {
     const [tasks, setTasks] = useState([]);
-    const [task, setTask] = useState("");
     const [editingTaskId, setEditingTaskId] = useState(null);
     const [newTaskContent, setNewTaskContent] = useState("");
 
@@ -20,19 +20,8 @@ const TodoApp = () => {
         fetchTodos();
     }, []);
 
-    const addTask = async () => {
-        if (task) {
-            try {
-                const newTask = await apiRequest("post", "/api/todos", {
-                    task: taskInput,
-                    completed: false,
-                });
-                setTasks((prevTasks) => [...prevTasks, newTask]);
-                setTaskInput("");
-            } catch (error) {
-                console.error("Error adding task:", error);
-            }
-        }
+    const handleTaskAdded = (newTask) => {
+        setTasks((prevTasks) => [...prevTasks, newTask]);
     };
 
     const toggleTask = async (taskToToggle) => {
@@ -67,11 +56,19 @@ const TodoApp = () => {
 
     const updateTask = async () => {
         if (editingTaskId && newTaskContent) {
-            const updatedTask = tasks.find(task => task.id === editingTaskId);
+            const updatedTask = tasks.find((task) => task.id === editingTaskId);
             const updatedTaskData = { ...updatedTask, task: newTaskContent };
             try {
-                await apiRequest('put', `/api/todos/${editingTaskId}`, updatedTaskData);
-                setTasks(prevTasks => prevTasks.map(task => task.id === editingTaskId ? updatedTaskData : task));
+                await apiRequest(
+                    "put",
+                    `/api/todos/${editingTaskId}`,
+                    updatedTaskData
+                );
+                setTasks((prevTasks) =>
+                    prevTasks.map((task) =>
+                        task.id === editingTaskId ? updatedTaskData : task
+                    )
+                );
                 setEditingTaskId(null);
                 setNewTaskContent("");
             } catch (error) {
@@ -103,18 +100,7 @@ const TodoApp = () => {
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Todo List</h1>
-            <input
-                type="text"
-                value={task}
-                onChange={(e) => setTask(e.target.value)}
-                className="border p-2"
-            />
-            <button
-                onClick={addTask}
-                className="bg-blue-500 text-white p-2 ml-2"
-            >
-                Add Task
-            </button>
+            <AddTodo onTaskAdded={handleTaskAdded} />
             <ul className="mt-4">
                 {sortedTasks.map((t) => (
                     <li key={t.id} className="flex items-center mb-2">
