@@ -57,6 +57,8 @@ const TodoApp = () => {
         });
     };
 
+    const sortedTasks = tasks.slice().sort((a, b) => a.completed - b.completed);
+
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Todo List</h1>
@@ -73,7 +75,7 @@ const TodoApp = () => {
                 Add Task
             </button>
             <ul className="mt-4">
-                {tasks.map((t, i) => (
+                {sortedTasks.map((t, i) => (
                     <li key={i} className="flex items-center mb-2">
                         <input
                             type="checkbox"
